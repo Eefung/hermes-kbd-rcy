@@ -13,7 +13,14 @@ RCS=("$HOME/.bashrc" "$HOME/.zshrc")
 
 uninstall() {
     for f in "${FISH_FILES[@]}"; do
-        rm -f "$FISH_DIR/$f"
+        [ -f "$FISH_DIR/$f" ] || continue
+        # 只删除带本项目标记的文件,避免误删用户自建的同名 fish 函数
+        if grep -qF 'tui-mode-recovery' "$FISH_DIR/$f" 2>/dev/null; then
+            rm -f "$FISH_DIR/$f"
+            echo "removed fish function: $FISH_DIR/$f"
+        else
+            echo "skipped (not installed by this project): $FISH_DIR/$f"
+        fi
     done
     for rc in "${RCS[@]}"; do
         [ -f "$rc" ] || continue

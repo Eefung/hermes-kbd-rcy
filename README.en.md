@@ -30,7 +30,7 @@ Full measured matrix: [docs/probe-evidence.md](docs/probe-evidence.md).
    Enter the alt screen (`1049h`), pop + zero the flags there, return (`1049l`), pop + zero the main stack, then reset modifyOtherKeys (`>4m`), focus reporting (1004), bracketed paste (2004) and show the cursor. Excess pops are no-ops on an empty stack; `=0u` is stack-depth-independent; if the TUI died still inside the alt screen, the leading `1049h` is a no-op and the sequence still ends on the main screen.
 
 2. **Shell wrappers** that auto-recover after the culprit exits:
-   - fish: `functions/hermes.fish` (autoloaded, no config.fish edit), `functions/tmr.fish` (generic)
+   - fish: `functions/hermes.fish` (covers `hermes --tui` and bare `hermes`; autoloaded, no config.fish edit), `functions/tmr.fish` (generic)
    - bash / zsh: `lib/tui-recover.sh` (`tmr` + `hermes`)
 3. **Probe** `tools/kbdprobe.py`: reports per-screen flags via `CSI ?u`, can reproduce the leak, can apply the fix
 4. **Byte-level tests** `tests/test-byte-output.sh`: fake binary + real pty + `od`
@@ -50,7 +50,7 @@ tmr <command> [args...]          # generic wrapper
 printf '\e[?1049h\e[<u\e[<u\e[<u\e[=0u\e[?1049l\e[<u\e[<u\e[<u\e[=0u\e[>4m\e[?1004l\e[?2004l\e[?25h'   # manual
 ```
 
-Wrappers emit sequences only when stdout is a tty AND the args match, so piped/scripted calls (`hermes chat -q`) stay clean; exit codes are preserved.
+Wrappers emit sequences only when stdout is a tty AND the invocation is a TUI candidate (`--tui`, or bare — covering `display.interface: tui`), so piped/scripted calls (`hermes chat -q`) stay clean; exit codes are preserved.
 
 ## Probe / tests
 

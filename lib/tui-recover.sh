@@ -26,11 +26,12 @@ tmr() {
     return $rc
 }
 
-# hermes --tui convenience wrapper (matches functions/hermes.fish).
+# hermes convenience wrapper (matches functions/hermes.fish). Bare `hermes`
+# also triggers: with display.interface: tui the bare invocation IS the TUI.
 hermes() {
     command hermes "$@"
     local rc=$?
-    if [ -t 1 ] && [[ "$*" == *--tui* ]]; then
+    if [ -t 1 ] && { [ $# -eq 0 ] || [[ "$*" == *--tui* ]]; }; then
         tui_recover_seq
     fi
     return $rc

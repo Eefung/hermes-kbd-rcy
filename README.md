@@ -30,7 +30,7 @@ kitty 对 **主屏和 alt screen 各维护一份独立的协议栈**(规范如�
    先进 alt 屏(`1049h`)弹栈并清零 flags,回主屏(`1049l`)再清一遍,然后复位 modifyOtherKeys(`>4m`)、focus reporting(1004)、bracketed paste(2004),并显示光标。多余的 pop 对空栈是无害 no-op,`=0u` 清零与栈深度无关,所以对任意深度的残留都有效;若 TUI 死在 alt 屏里没出来,开头的 `1049h` 是 no-op,序列结束时仍保证回到主屏。
 
 2. **shell 包装函数**,让肇事命令退出后自动恢复:
-   - fish:`functions/hermes.fish`(针对 `hermes --tui`,自动加载,无需改 config.fish)、`functions/tmr.fish`(通用版)
+   - fish:`functions/hermes.fish`(针对 `hermes --tui` 与裸 `hermes`,自动加载,无需改 config.fish)、`functions/tmr.fish`(通用版)
    - bash / zsh:`lib/tui-recover.sh`(提供 `tmr` 与 `hermes` 两个函数)
 3. **探针** `tools/kbdprobe.py`:用 `CSI ?u` 查询各屏 flags,可复现残留、可执行修复
 4. **字节级测试** `tests/test-byte-output.sh`:fake binary + pty + `od`,验证包装函数实际发出的字节、退出码是否保留、管道场景是否静默
@@ -58,7 +58,7 @@ tmr <command> [args...]
 printf '\e[?1049h\e[<u\e[<u\e[<u\e[=0u\e[?1049l\e[<u\e[<u\e[<u\e[=0u\e[>4m\e[?1004l\e[?2004l\e[?25h'
 ```
 
-包装函数只在「stdout 是 tty 且参数匹配」时发序列:`hermes chat -q`、`tmr` 在管道/脚本里调用时输出不受污染;退出码原样保留。
+包装函数只在「stdout 是 tty」且调动是 TUI 候选(`--tui` 或无参数——后者覆盖 `display.interface: tui` 的配置)时发序列:`hermes chat -q`、`tmr` 在管道/脚本里调用时输出不受污染;退出码原样保留。
 
 ## 探针
 
