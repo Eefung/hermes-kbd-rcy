@@ -8,7 +8,7 @@ This repo gives you one command that does not clear the screen, plus a small too
 
 ```sh
 # Already stuck? Recover now (no screen clear, scrollback untouched)
-printf '\e[?1049h\e[<u\e[=0u\e[?1049l'
+printf '\e[?1049h\e[<u\e[?1049l'
 
 # Install once: hermes --tui cleans up on exit (fish / bash / zsh)
 ./install.sh
@@ -83,7 +83,7 @@ CI runs everything on every push, including shellcheck and fish syntax checks.
 ## Known limits
 
 - tmux and ssh kitten keep their own copy of the state; the targeted cleanup may not be enough there, so `reset` remains the fallback (full reset, both screens, at the cost of the screen).
-- Built for versions whose stack depth is 1 (hermes v0.23.0 and later); v0.18 accumulates pushes, so swap `<u>` for `=0u` there (`printf '\e[?1049h\e[=0u\e[?1049l'`).
+- Built for versions that pair one pop with one push (hermes v0.23.0 and later); v0.18 accumulates pushes, so a single `<u>` is not enough there and those builds are out of scope. `=0u` is no substitute either: it only rewrites the flags, the stack entry stays and the next `<u>` brings it right back (see [docs/evidence.md](docs/evidence.md)).
 - Terminals without CSI-u support ignore these sequences; the wrappers are a harmless no-op for them.
 - Once the upstream fix ships, remove this layer with `./install.sh --uninstall`.
 

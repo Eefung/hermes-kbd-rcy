@@ -8,7 +8,7 @@
 
 ```sh
 # 已经卡住：立即恢复（不清屏、不动滚动缓冲）
-printf '\e[?1049h\e[<u\e[=0u\e[?1049l'
+printf '\e[?1049h\e[<u\e[?1049l'
 
 # 装一次，之后 hermes --tui 退出自动清理（fish / bash / zsh）
 ./install.sh
@@ -83,7 +83,7 @@ CI 每次推送跑全套，含 shellcheck 与 fish 语法检查。
 ## 已知边界
 
 - tmux、ssh kitten 这类中间层自己维护一份状态，定向清理可能不够，需要 `reset` 兜底（它是全量复位，两页一起清，代价是清屏）。
-- 只适用于栈深为 1 的版本（hermes v0.23.0 及之后）；v0.18 会累积多条 push，那种情况下把 `<u>` 换成 `=0u`（`printf '\e[?1049h\e[=0u\e[?1049l'`）。
+- 只适用于一次 push 对应一次弹栈的版本（hermes v0.23.0 及之后）；v0.18 会累积多条 push，一次 `<u>` 不够，不在覆盖范围。`=0u` 也不能顶替弹栈——它只改 flags，栈里的记录仍在，下一次 `<u>` 会原样弹回来（见 [docs/evidence.md](docs/evidence.md)）。
 - 不支持 CSI-u 的终端会忽略这些序列，包装对它们是无害空操作。
 - 上游修复发布后，执行 `./install.sh --uninstall` 移除这层壳即可。
 

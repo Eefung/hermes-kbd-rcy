@@ -19,7 +19,7 @@ printf '\e[?1049h\e[<u\e[?1049l'
 - 启动顺序：`\e[?1049h`（偏移 787）先于 `\e[>1u`（886），push 落在全屏页。
 - 退出块：`1004l → 2004l → 1049l → <u → >4m → 0m → 25h`。focus 上报、粘贴模式、modifyOtherKeys、光标都由 hermes 自己恢复；唯一漏掉的是全屏页键盘设置，因为 `<u` 在 `1049l` 之后，弹到了命令行页。
 - 两页各存一份栈、互不继承：退出后 main = 0、alt = 1；从主屏清理不影响 alt。
-- 栈深：v0.23.0 退出时为 1，单次 `<u>` 足够；深度 2 时单次弹栈失效，需要 `=0u`（v0.18 会累积 push）。
+- 栈深：v0.23.0 退出时为 1，单次 `<u>` 足够；v0.18 会累积 push，一次弹栈不够，而这种旧版本的退出顺序同样有 bug，修复代码到不了它那里。
 
 ## 实现
 
@@ -46,20 +46,21 @@ tests/test-install.sh                        # 11/11
 
 - issue [#56759](https://github.com/NousResearch/hermes-agent/issues/56759) 仍 open。
 - PR [#57161](https://github.com/NousResearch/hermes-agent/pull/57161)、[#56765](https://github.com/NousResearch/hermes-agent/pull/56765) open 但**都修不好**：复位串与退出块的 pop 都发生在离开全屏页之后。
-- 本仓库提交的修复 PR：[#152683](https://github.com/NousResearch/hermes-agent/pull/152683)（ink.tsx 在 `EXIT_ALT_SCREEN` 前弹栈；terminalModes.ts 把 `<u` + `=0u` 移到 `1049l` 前；新增顺序断言测试）。
+- 本仓库提交的修复 PR：[#152683](https://github.com/NousResearch/hermes-agent/pull/152683)（ink.tsx 在 `EXIT_ALT_SCREEN` 前弹栈；terminalModes.ts 把 `<u` 移到 `1049l` 前；新增顺序断言测试；不含 `=0u`）。
 - issue 下的说明评论：[#issuecomment-6769924919](https://github.com/NousResearch/hermes-agent/issues/56759#issuecomment-6769924919)。
 - 上游合并后执行 `./install.sh --uninstall` 移除包装。
 
 ## 已定决策
 
 - 只清全屏页：命令行页实测恒为 0，清它是空操作。
-- 用单次 `<u>`，与 hermes 自身退出清理一致；深栈旧版本换 `=0u`（README 已注明）。
+- 用单次 `<u>`，与 hermes 自身退出清理一致；深栈的旧版本不在覆盖范围。
+- 不写 `=0u`：kitty 的 `CSI = 0u` 只改 flags、不动栈，实测深度 2 时 `=0u` 之后一次 `<u>` 又读出 1。它能把症状藏起来，藏不住状态。
 - 不加尾部复位：hermes 自己会恢复 focus / 粘贴 / 光标 / modifyOtherKeys。
 - 包装只在 stdout 是 tty、且调用是 TUI 候选（`--tui` 或无参数）时发序列。
 - 文档只讲症状与修法，不写试错经历；视频稿不需要。
 
 ## 边界
 
-- 栈深 > 1 的旧版本（v0.18）不在覆盖范围，需换 `=0u`。
+- 栈深 > 1 的旧版本（v0.18）不在覆盖范围。
 - tmux、ssh kitten 自持状态副本，未实测，遇到时用 `reset`。
 - 异常退出（信号、崩溃）不在覆盖范围。
