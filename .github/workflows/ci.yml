@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装依赖（fish、zsh、shellcheck）
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fish zsh shellcheck
+
+      - name: shellcheck 全部 shell 脚本
+        run: shellcheck install.sh lib/tui-recover.sh bin/tui-recover tests/*.sh
+
+      - name: fish 语法检查
+        run: |
+          for f in functions/*.fish; do fish -n "$f"; done
+
+      - name: Python 语法与单元测试
+        run: |
+          python3 -m py_compile tools/kbdprobe.py tests/test_probe.py
+          python3 -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: 字节级测试（假二进制 + 真实 pty）
+        run: tests/test-byte-output.sh
+
+      - name: 安装器测试（临时 HOME 沙箱）
+        run: tests/test-install.sh

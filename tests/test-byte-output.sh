@@ -9,7 +9,7 @@
 # the repo files are exercised even on a machine where the project is already
 # installed (and on a clean machine where it is not).
 set -u
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 REPO="$PWD"
 
 EXPECTED="$(printf '\033[?1049h\033[<u\033[<u\033[<u\033[=0u\033[?1049l\033[<u\033[<u\033[<u\033[=0u\033[>4m\033[?1004l\033[?2004l\033[?25h')"
@@ -41,9 +41,19 @@ assert_rc7() { # $1 label  $2 file
 mkdir -p "$TMP/fishcfg/fish/functions"
 cp "$REPO"/functions/*.fish "$TMP/fishcfg/fish/functions/"
 
-printf 'hermes --tui\necho "rc=$status"\n' > "$TMP/fish_trigger.fish"
-printf 'hermes chat -q hi\necho "rc=$status"\n' > "$TMP/fish_other.fish"
-printf 'hermes\necho "rc=$status"\n' > "$TMP/fish_bare.fish"
+# shellcheck disable=SC2016  # fish 脚本内容里的 $status 不展开
+cat > "$TMP/fish_trigger.fish" <<'EOS'
+hermes --tui
+echo "rc=$status"
+EOS
+cat > "$TMP/fish_other.fish" <<'EOS'
+hermes chat -q hi
+echo "rc=$status"
+EOS
+cat > "$TMP/fish_bare.fish" <<'EOS'
+hermes
+echo "rc=$status"
+EOS
 
 cat > "$TMP/fishrun.sh" <<EOF
 #!/usr/bin/env bash

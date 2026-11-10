@@ -62,24 +62,29 @@ printf '\e[?1049h\e[<u\e[<u\e[<u\e[=0u\e[?1049l\e[<u\e[<u\e[<u\e[=0u\e[>4m\e[?10
 | `lib/tui-recover.sh` | bash / zsh 版：`tmr` 与 `hermes` 两个函数 |
 | `tools/kbdprobe.py` | 探针：按屏查询 `CSI ? u`，可复现可修复，支持 JSON 输出 |
 | `tests/test-byte-output.sh` | 字节级测试：假二进制加真实 pty，核对实际发出的字节 |
-| `install.sh` | 幂等安装与卸载 |
+| `install.sh` | 幂等安装、`--check` 漂移检测、卸载 |
+| `bin/tui-recover` | 独立 CLI：不依赖任何 shell 包装也能立刻恢复；`--dry-run` 只打印字节 |
 | `docs/evidence.md` | 全部结论的实测记录 |
+| `.github/workflows/ci.yml` | CI：shellcheck、fish 语法、单元测试、字节级与安装器测试 |
 
 ## 安装与卸载
 
 ```sh
-./install.sh               # fish：函数复制进 ~/.config/fish/functions/
-                           # bash/zsh：给已有 rc 文件追加带标记的 source 块
+./install.sh               # fish 函数进 ~/.config/fish/functions/，
+                           # lib 进 ~/.local/share/tui-mode-recovery/lib/，
+                           # bash/zsh rc 追加带标记、带可读性守卫的 source 块
+./install.sh --check       # 校验已安装副本与仓库一致；漂移时退出码 1
 ./install.sh --uninstall   # 只删带标记的文件与 rc 块，用户自建的同名函数不动
 ```
 
-重复执行安全，新开一个 shell 生效。
+重复执行安全；`git pull` 之后重跑一次即刷新已装副本。
 
 ## 使用
 
 ```sh
 hermes --tui               # 自动恢复（fish / bash / zsh 通用）
 tmr <命令> [参数…]        # 任何会弄脏终端状态的 TUI
+tui-recover                # 独立 CLI，效果同下面那条 printf（--dry-run 只看字节）
 printf '...'               # 手动恢复，等价于上面那条 printf
 ```
 
@@ -102,7 +107,7 @@ python3 tools/kbdprobe.py --json            # 机器可读
 tests/test-byte-output.sh
 ```
 
-12 个用例：两屏序列逐字节匹配、退出码透传、管道静默、非 TUI 参数静默、裸 `hermes` 触发，覆盖 fish / bash / zsh 三种包装。fish 用例用临时 `XDG_CONFIG_HOME` 加载仓库里的函数，测的不是本机已安装副本。
+12 个字节级用例（fish / bash / zsh 包装，pty 下逐字节比对）、7 个探针解析单测、11 个安装器用例（沙箱安装、幂等、漂移检测、卸载保护）。CI 在每次推送时跑全套：shellcheck、fish 语法、Python 单测、字节级与安装器测试。fish 用例用临时 `XDG_CONFIG_HOME` 加载仓库里的函数，测的不是本机已安装副本。
 
 ## 已知边界
 

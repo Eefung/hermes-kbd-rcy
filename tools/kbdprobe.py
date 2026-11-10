@@ -38,6 +38,18 @@ FIX_SEQ = (
 
 SIM_SEQ = '\x1b[?1049h\x1b[>1u\x1b[?1049l'  # push inside alt, exit without pop
 
+REPLY_RE = re.compile(rb'\x1b\[\?(\d+)u')
+
+
+def parse_flags(buf):
+    """Parse a ``CSI ? flags u`` reply out of ``buf``; None when absent.
+
+    Kept as a module-level function so the reply parsing is unit-testable
+    without a pty (see tests/test-probe.py).
+    """
+    m = REPLY_RE.search(buf)
+    return int(m.group(1)) if m else None
+
 
 def query(fd, ttyfd):
     """Current screen's CSI-u flags via CSI ? u. Returns int or None."""
@@ -51,8 +63,7 @@ def query(fd, ttyfd):
             buf += os.read(fd, 128)
             if b'u' in buf:
                 break
-    m = re.search(rb'\x1b\[\?(\d+)u', buf)
-    return int(m.group(1)) if m else None
+    return parse_flags(buf)
 
 
 def fmt(screen, flags):

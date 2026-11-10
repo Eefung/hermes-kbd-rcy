@@ -62,24 +62,29 @@ Why it is safe: extra pops on an empty stack are no-ops by spec; `=0u` zeroes th
 | `lib/tui-recover.sh` | bash / zsh: `tmr` and `hermes` functions |
 | `tools/kbdprobe.py` | probe: per-screen `CSI ? u`, leak reproduction, fix, JSON output |
 | `tests/test-byte-output.sh` | byte-level tests: fake binary on a real pty, exact bytes checked |
-| `install.sh` | idempotent install and uninstall |
+| `install.sh` | idempotent install, `--check` drift detection, uninstall |
+| `bin/tui-recover` | standalone CLI: recover without any shell wrapper; `--dry-run` prints the bytes |
 | `docs/evidence.md` | the measurements behind every claim |
+| `.github/workflows/ci.yml` | CI: shellcheck, fish syntax, unit tests, byte-level and installer tests |
 
 ## Install and uninstall
 
 ```sh
-./install.sh               # fish: functions copied into ~/.config/fish/functions/
-                           # bash/zsh: marker-guarded source block appended to existing rc files
+./install.sh               # fish functions into ~/.config/fish/functions/,
+                           # lib into ~/.local/share/tui-mode-recovery/lib/,
+                           # marker-guarded, readable-guarded source block in bash/zsh rc
+./install.sh --check       # verify installed copies match the repo; exit 1 on drift
 ./install.sh --uninstall   # removes only marked files and rc blocks; user-created functions untouched
 ```
 
-Re-running is safe; start a new shell afterwards.
+Re-running is safe; after `git pull`, run it again to refresh the installed copies.
 
 ## Usage
 
 ```sh
 hermes --tui               # auto-recover on exit (fish / bash / zsh)
 tmr <command> [args…]      # any TUI that can dirty terminal state
+tui-recover                # standalone CLI, same as the printf below (--dry-run shows bytes)
 printf '...'               # manual recovery, same sequence as above
 ```
 
@@ -102,7 +107,7 @@ python3 tools/kbdprobe.py --json            # machine-readable
 tests/test-byte-output.sh
 ```
 
-12 cases: exact two-screen byte sequence, exit-code propagation, piped silence, non-TUI args silence, bare-`hermes` trigger, across the fish / bash / zsh wrappers. The fish cases load the repo's functions through a temporary `XDG_CONFIG_HOME`, so they test the repo, not an installed copy.
+12 byte-level cases (fish / bash / zsh wrappers, byte-exact on a real pty), 7 probe-parser unit tests, 11 installer cases (sandbox install, idempotency, drift detection, uninstall guards). CI runs the whole set on every push: shellcheck, fish syntax, Python unit tests, byte-level and installer tests. The fish cases load the repo's functions through a temporary `XDG_CONFIG_HOME`, so they test the repo, not an installed copy.
 
 ## Known limits
 

@@ -1,0 +1,37 @@
+#!/bin/sh
+# tui-recover — 向当前终端发送两屏 kitty 键盘协议清理序列。
+# 用法: tui-recover [--dry-run]
+set -u
+
+usage() {
+    cat <<'EOF'
+用法: tui-recover [选项]
+
+向当前终端写入清理序列:
+  1) 进入 alt 屏（DECSET 1049），弹空它的协议栈并清零 flags
+  2) 返回主屏，同样弹栈并清零
+  3) 复位 modifyOtherKeys、focus 上报、bracketed paste，恢复光标
+
+选项:
+  --dry-run   不写终端，以 od -c 形式打印将要发送的字节
+  -h, --help  显示本帮助
+
+退出码: 0 成功；1 stdout 不是终端（且未加 --dry-run）；2 参数错误
+EOF
+}
+
+case "${1:-}" in
+    -h|--help) usage; exit 0 ;;
+    --dry-run)
+        printf '\033[?1049h\033[<u\033[<u\033[<u\033[=0u\033[?1049l\033[<u\033[<u\033[<u\033[=0u\033[>4m\033[?1004l\033[?2004l\033[?25h' | od -An -c
+        exit 0
+        ;;
+    "") ;;
+    *) usage >&2; exit 2 ;;
+esac
+
+if [ ! -t 1 ]; then
+    echo "tui-recover: stdout 不是终端，未发送序列（用 --dry-run 查看字节）" >&2
+    exit 1
+fi
+printf '\033[?1049h\033[<u\033[<u\033[<u\033[=0u\033[?1049l\033[<u\033[<u\033[<u\033[=0u\033[>4m\033[?1004l\033[?2004l\033[?25h'

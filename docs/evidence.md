@@ -67,7 +67,7 @@ rs1=\E]\E\\\Ec
 
 `tests/test-byte-output.sh` 用假二进制加真实 pty 核对：pty 下发出的字节与预期序列完全一致、退出码 7 原样透传、管道调用零转义字节、非 TUI 参数零字节。当前 12 个用例全部通过。
 
-安装器在临时 HOME 中验证过：重复执行不重复追加（幂等）、`--uninstall` 删除带标记的文件与 rc 块、用户自建的同名 `hermes.fish` 被跳过不动。
+安装器行为已固化为 `tests/test-install.sh`（临时 HOME 沙箱）：安装、幂等刷新、`--check` 漂移检测、`--uninstall` 只删带标记的文件与 rc 块、用户自建的同名 `hermes.fish` 不动。探针的应答解析也拆成了纯函数并配了单测（`tests/test_probe.py`，7 个用例），整套检查由 CI 在每次推送时执行。
 
 ## 环境
 

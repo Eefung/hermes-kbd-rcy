@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
 # tui-mode-recovery — restore terminal mode state after TUI apps exit.
 # Source from ~/.bashrc or ~/.zshrc (install.sh adds a guarded block).
 #
