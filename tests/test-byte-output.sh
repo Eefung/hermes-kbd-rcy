@@ -12,7 +12,7 @@ set -u
 cd "$(dirname "$0")/.." || exit 1
 REPO="$PWD"
 
-EXPECTED="$(printf '\033[?1049h\033[<u\033[<u\033[<u\033[=0u\033[?1049l\033[<u\033[<u\033[<u\033[=0u\033[>4m\033[?1004l\033[?2004l\033[?25h')"
+EXPECTED="$(printf '\033[?1049h\033[<u\033[=0u\033[?1049l')"
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT

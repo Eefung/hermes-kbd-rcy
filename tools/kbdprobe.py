@@ -26,15 +26,9 @@ import sys
 import termios
 import time
 
-# enter alt -> pop x3 + zero flags (alt stack) -> leave alt ->
-# pop x3 + zero flags (main stack) -> reset modifyOtherKeys/focus/paste/cursor
-FIX_SEQ = (
-    '\x1b[?1049h'
-    '\x1b[<u\x1b[<u\x1b[<u\x1b[=0u'
-    '\x1b[?1049l'
-    '\x1b[<u\x1b[<u\x1b[<u\x1b[=0u'
-    '\x1b[>4m\x1b[?1004l\x1b[?2004l\x1b[?25h'
-)
+# The leak is the ALT screen's setting, so the fix visits that screen only:
+# enter alt -> pop once + zero flags -> leave alt.
+FIX_SEQ = '\x1b[?1049h\x1b[<u\x1b[=0u\x1b[?1049l'
 
 SIM_SEQ = '\x1b[?1049h\x1b[>1u\x1b[?1049l'  # push inside alt, exit without pop
 
