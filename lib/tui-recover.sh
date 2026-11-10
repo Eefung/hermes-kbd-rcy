@@ -10,11 +10,11 @@
 # exit without popping leak the ALT stack: the prompt (main screen) looks
 # fine, but vi/micro/nano/less (alt screen) receive CSI-u fragments like
 # "113;5u". The leak is the alt stack, so the cleanup enters that screen,
-# pops and zeroes the setting, then returns.
+# pops once, then returns.
 
 tui_recover_seq() {
-    # enter alt -> pop once + clear flags -> leave alt
-    printf '\e[?1049h\e[=0u\e[?1049l'
+    # enter alt -> pop once -> leave alt
+    printf '\e[?1049h\e[<u\e[?1049l'
 }
 
 # tmr <command> [args...] — run a command, restore terminal state after it exits.

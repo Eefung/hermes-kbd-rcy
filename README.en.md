@@ -28,9 +28,9 @@ alt              1    STUCK — alt-screen apps (vi/micro/nano) will see CSI-u f
 
 The command-line screen (main) reads 0; the fullscreen-program screen (alt) reads 1. An editor switches into the alt screen, inherits that setting, and keys become text.
 
-hermes restores focus reporting, bracketed paste, modifyOtherKeys and the cursor itself on exit (measured: its final reset block ends `1004l → 2004l → 1049l → <u → >4m → 0m → 25h`). The one thing it does not restore is the alt screen's keyboard setting, because `<u` comes after `1049l`, so the pop lands on the main screen. The command therefore does exactly one thing: enter the alt screen, pop and zero the setting, come back.
+hermes restores focus reporting, bracketed paste, modifyOtherKeys and the cursor itself on exit (measured: its final reset block ends `1004l → 2004l → 1049l → <u → >4m → 0m → 25h`). The one thing it does not restore is the alt screen's keyboard setting, because `<u` comes after `1049l`, so the pop lands on the main screen. The command therefore does exactly one thing: enter the alt screen, pop, come back.
 
-`=0u` zeroes the setting regardless of stack depth. A single pop only works when the stack holds exactly one entry (measured: it fails at depth 2), so the command zeroes instead of popping. Full measurements: [docs/evidence.md](docs/evidence.md).
+Popping is the same mechanism hermes uses in its own exit cleanup. On v0.23.0 the stack holds exactly one entry at exit (measured), so a single `<u>` restores the alt screen. Full measurements: [docs/evidence.md](docs/evidence.md).
 
 ## Components
 
@@ -83,6 +83,7 @@ CI runs everything on every push, including shellcheck and fish syntax checks.
 ## Known limits
 
 - tmux and ssh kitten keep their own copy of the state; the targeted cleanup may not be enough there, so `reset` remains the fallback (full reset, both screens, at the cost of the screen).
+- Built for versions whose stack depth is 1 (hermes v0.23.0 and later); v0.18 accumulates pushes, so swap `<u>` for `=0u` there (`printf '\e[?1049h\e[=0u\e[?1049l'`).
 - Terminals without CSI-u support ignore these sequences; the wrappers are a harmless no-op for them.
 - Once the upstream fix ships, remove this layer with `./install.sh --uninstall`.
 
