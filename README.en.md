@@ -30,7 +30,7 @@ The command-line screen (main) reads 0; the fullscreen-program screen (alt) read
 
 hermes restores focus reporting, bracketed paste, modifyOtherKeys and the cursor itself on exit (measured: its final reset block ends `1004l → 2004l → 1049l → <u → >4m → 0m → 25h`). The one thing it does not restore is the alt screen's keyboard setting, because `<u` comes after `1049l`, so the pop lands on the main screen. The command therefore does exactly one thing: enter the alt screen, pop and zero the setting, come back.
 
-`=0u` zeroes the setting regardless of stack depth; `<u` is there for terminals that only implement popping. Full measurements: [docs/evidence.md](docs/evidence.md).
+`=0u` zeroes the setting regardless of stack depth. A single pop only works when the stack holds exactly one entry (measured: it fails at depth 2), so the command zeroes instead of popping. Full measurements: [docs/evidence.md](docs/evidence.md).
 
 ## Components
 

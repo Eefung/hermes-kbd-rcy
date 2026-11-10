@@ -14,7 +14,7 @@ function hermes --wraps hermes --description 'hermes + 退出后恢复终端键�
         set trigger yes
     end
     if isatty stdout; and test -n "$trigger"
-        printf '\e[?1049h\e[<u\e[=0u\e[?1049l'
+        printf '\e[?1049h\e[=0u\e[?1049l'
     end
     return $rc
 end

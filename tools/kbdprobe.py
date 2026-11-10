@@ -28,7 +28,7 @@ import time
 
 # The leak is the ALT screen's setting, so the fix visits that screen only:
 # enter alt -> pop once + zero flags -> leave alt.
-FIX_SEQ = '\x1b[?1049h\x1b[<u\x1b[=0u\x1b[?1049l'
+FIX_SEQ = '\x1b[?1049h\x1b[=0u\x1b[?1049l'
 
 SIM_SEQ = '\x1b[?1049h\x1b[>1u\x1b[?1049l'  # push inside alt, exit without pop
 

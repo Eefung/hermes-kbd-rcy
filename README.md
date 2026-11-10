@@ -30,7 +30,7 @@ alt              1    STUCK — alt-screen apps (vi/micro/nano) will see CSI-u f
 
 hermes 退出时自己会恢复 focus 上报、粘贴模式、modifyOtherKeys 和光标（实测：退出块最后是 `1004l → 2004l → 1049l → <u → >4m → 0m → 25h`），唯一没恢复的就是全屏页的键盘设置，因为 `<u` 排在 `1049l` 后面，弹栈落在主屏。所以命令只做一件事：进全屏页弹栈并清零，再回来。
 
-`=0u` 直接清零设置，与栈有多深无关；`<u` 是给只认弹栈的终端留的。完整测量记录见 [docs/evidence.md](docs/evidence.md)。
+`=0u` 直接清零设置，与栈有多深无关；单次弹栈只在栈里恰好一条记录时有效（实测深度 2 就失效），所以命令用清零。完整测量记录见 [docs/evidence.md](docs/evidence.md)。
 
 ## 组件
 

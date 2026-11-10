@@ -14,7 +14,7 @@
 
 tui_recover_seq() {
     # enter alt -> pop once + clear flags -> leave alt
-    printf '\e[?1049h\e[<u\e[=0u\e[?1049l'
+    printf '\e[?1049h\e[=0u\e[?1049l'
 }
 
 # tmr <command> [args...] — run a command, restore terminal state after it exits.
