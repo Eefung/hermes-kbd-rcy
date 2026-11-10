@@ -28,6 +28,8 @@ alt              1    STUCK — alt-screen apps (vi/micro/nano) will see CSI-u f
 
 The command-line screen (main) reads 0; the fullscreen-program screen (alt) reads 1. An editor switches into the alt screen, inherits that setting, and keys become text. Each screen keeps its own copy, so the cleanup has to go in, clear, and come back to clear again. That is exactly what the one-liner does.
 
+hermes restores focus reporting, bracketed paste, modifyOtherKeys and the cursor itself on exit (measured: its final reset block ends `1004l → 2004l → 1049l → <u → >4m → 0m → 25h`). The one thing it does not restore is the alt screen's keyboard setting, because `<u` comes after `1049l`, so the pop lands on the main screen. The tail of our command (`>4m`, `1004l`, `2004l`, `25h`) is a no-op on a normal exit; it only matters when the app dies abnormally (signal, crash).
+
 Extra pops on an empty stack are harmless, and `=0u` zeroes the setting regardless of stack depth. Full measurements: [docs/evidence.md](docs/evidence.md).
 
 ## Components
