@@ -1,6 +1,6 @@
 # tui-mode-recovery
 
-You finish with a TUI app, get your prompt back, and everything looks fine. Then you open micro, vim or nano and the shortcuts are dead: Ctrl+Q does not quit, your buffer gets the literal text `113;5u` instead, and arrows and Ctrl+C stop working too. `reset` brings the terminal back, at the price of wiping the screen.
+You finish with a TUI app, get your prompt back, and everything looks fine. Then you open micro, vim or nano and every Ctrl shortcut is dead: Ctrl+Q does not quit, your buffer gets the literal text `113;5u` instead, and save/find shortcuts fail the same way (arrows and plain typing are unaffected). `reset` brings the terminal back, at the price of wiping the screen.
 
 This repo gives you one command that does not clear the screen, plus a small tool that makes it automatic after one install.
 
