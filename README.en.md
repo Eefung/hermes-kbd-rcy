@@ -43,15 +43,25 @@ Wrappers emit sequences only when stdout is a tty and the invocation is a TUI ca
 
 ## FAQ
 
-**Does it help under tmux or ssh kitten?** Not always. Those layers keep their own copy of the state, so the targeted cleanup may not be enough; `reset` remains the fallback — a full reset covering both screens, at the cost of clearing the screen.
+**Does it help under tmux or ssh kitten?**
 
-**Why not fix old hermes (v0.18) too?** v0.18 accumulates pushes, so a single `<u>` is not enough and those builds are out of scope. `=0u` is no substitute either: it only rewrites the flags, the stack entry stays and the next `<u>` brings it right back (see [evidence](docs/evidence.md)).
+Not always. Those layers keep their own copy of the state, so the targeted cleanup may not be enough; `reset` remains the fallback — a full reset covering both screens, at the cost of clearing the screen.
 
-**What about terminals without CSI-u support?** They ignore these sequences, so the wrappers are a harmless no-op there.
+**Why not fix old hermes (v0.18) too?**
 
-**Does it clean up after a signal or crash?** No. The wrappers emit the sequence on the normal exit path only.
+v0.18 accumulates pushes, so a single `<u>` is not enough and those builds are out of scope. `=0u` is no substitute either: it only rewrites the flags, the stack entry stays and the next `<u>` brings it right back (see [evidence](docs/evidence.md)).
 
-**Do I still need this after the upstream fix ships?** No — remove the layer with `./install.sh --uninstall`.
+**What about terminals without CSI-u support?**
+
+They ignore these sequences, so the wrappers are a harmless no-op there.
+
+**Does it clean up after a signal or crash?**
+
+No. The wrappers emit the sequence on the normal exit path only.
+
+**Do I still need this after the upstream fix ships?**
+
+No — remove the layer with `./install.sh --uninstall`.
 
 ## Development
 
@@ -85,4 +95,4 @@ CI runs everything on every push, including shellcheck and fish syntax checks.
 
 ## License
 
-MIT
+MIT, see [`LICENSE`](LICENSE).
