@@ -15,9 +15,7 @@ alt              1    STUCK — alt-screen apps (vi/micro/nano) will see CSI-u f
 
 The command-line screen (main) reads 0; the fullscreen-program screen (alt) reads 1. An editor switches into the alt screen, inherits that setting, and keys become text.
 
-hermes restores focus reporting, bracketed paste, modifyOtherKeys and the cursor itself on exit (measured: its final reset block ends `1004l → 2004l → 1049l → <u → >4m → 0m → 25h`). The one thing it does not restore is the alt screen's keyboard setting, because `<u` comes after `1049l`, so the pop lands on the main screen. The command therefore does exactly one thing: enter the alt screen, pop, come back.
-
-Popping is the same mechanism hermes uses in its own exit cleanup. On v0.23.0 the stack holds exactly one entry at exit (measured), so a single `<u>` restores the alt screen. Full measurements: [evidence](docs/evidence.md).
+hermes restores focus reporting, bracketed paste, modifyOtherKeys and the cursor itself on exit. The one thing it does not restore is the alt screen's keyboard setting, because `<u` comes after `1049l`, so the pop lands on the main screen. The command therefore does exactly one thing: enter the alt screen, pop, come back — the same mechanism hermes uses in its own exit cleanup, one `<u>` is enough. Full measurements: [evidence](docs/evidence.md).
 
 ## Installation
 
@@ -70,8 +68,6 @@ tests/test-byte-output.sh                              # 12 byte-level cases
 tests/test-install.sh                                  # 11 installer cases
 python3 -m unittest discover -s tests -p 'test_*.py'   # 7 probe-parser unit tests
 ```
-
-CI runs everything on every push, including shellcheck and fish syntax checks.
 
 ## Documentation
 

@@ -15,9 +15,7 @@ alt              1    STUCK — alt-screen apps (vi/micro/nano) will see CSI-u f
 
 命令行这一页（主屏）是 0，全屏程序页（alt 屏）是 1。编辑器切进全屏页，接手的正是这份设置，按键于是变成文本。
 
-hermes 退出时自己会恢复 focus 上报、粘贴模式、modifyOtherKeys 和光标（实测：退出块最后是 `1004l → 2004l → 1049l → <u → >4m → 0m → 25h`），唯一没恢复的就是全屏页的键盘设置，因为 `<u` 排在 `1049l` 后面，弹栈落在主屏。所以命令只做一件事：进全屏页弹一次，再回来。
-
-弹栈和 hermes 自己的退出清理是同一种机制。v0.23.0 退出时栈里恰好一条记录（实测），一次 `<u>` 就把全屏页恢复成默认。完整测量见[实测记录](docs/evidence.md)。
+hermes 退出时自己会恢复 focus 上报、粘贴模式、modifyOtherKeys 和光标，唯一没恢复的就是全屏页的键盘设置，因为 `<u` 排在 `1049l` 后面，弹栈落在主屏。所以命令只做一件事：进全屏页弹一次，再回来——和 hermes 自己的退出清理同一种机制，一次 `<u>` 即恢复。完整测量见[实测记录](docs/evidence.md)。
 
 ## 安装
 
@@ -70,8 +68,6 @@ tests/test-byte-output.sh                              # 12 个字节级用例
 tests/test-install.sh                                  # 11 个安装器用例
 python3 -m unittest discover -s tests -p 'test_*.py'   # 7 个探针解析单测
 ```
-
-CI 每次推送跑全套，含 shellcheck 与 fish 语法检查。
 
 ## 文档
 
