@@ -1,4 +1,4 @@
-# TUI Terminal Mode Recovery
+# Ctrl shortcuts die after a TUI exits
 
 You finish with a TUI app, get your prompt back, and everything looks fine. Then you open micro, vim or nano and every Ctrl shortcut is dead: Ctrl+Q does not quit, your buffer gets the literal text `113;5u` instead, and save/find shortcuts fail the same way (arrows and plain typing are unaffected).
 
