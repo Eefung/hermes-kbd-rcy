@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Byte-level tests for tui-mode-recovery wrappers.
+# Byte-level tests for hermes-kbd-rcy wrappers.
 # Uses a fake TUI binary + a real pty (script) + grep on the raw bytes:
 #   1. trigger case emits the exact two-screen cleanup sequence
 #   2. exit code is preserved through the wrapper

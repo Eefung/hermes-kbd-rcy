@@ -1,4 +1,4 @@
-# installed by tui-mode-recovery — https://github.com/Eefung/tui-mode-recovery (remove: install.sh --uninstall)
+# installed by hermes-kbd-rcy — https://github.com/Eefung/hermes-kbd-rcy (remove: install.sh --uninstall)
 function hermes --wraps hermes --description 'hermes + 退出后恢复终端键盘协议状态'
     command hermes $argv
     set -l rc $status

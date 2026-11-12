@@ -22,19 +22,19 @@ expect() { # $1 描述  $2 命令
     if eval "$2"; then ok "$1"; else bad "$1"; fi
 }
 
-LIB="$XDG_DATA_HOME/tui-mode-recovery/lib/tui-recover.sh"
+LIB="$XDG_DATA_HOME/hermes-kbd-rcy/lib/tui-recover.sh"
 FISH="$XDG_CONFIG_HOME/fish/functions"
 
 # 1) 安装
 bash "$REPO/install.sh" >/dev/null
 expect "安装 fish 函数" "[ -f '$FISH/hermes.fish' ]"
 expect "安装稳定路径 lib" "[ -f '$LIB' ]"
-expect "rc 块指向稳定路径" "grep -qF 'tui-mode-recovery/lib/tui-recover.sh' '$HOME/.bashrc'"
+expect "rc 块指向稳定路径" "grep -qF 'hermes-kbd-rcy/lib/tui-recover.sh' '$HOME/.bashrc'"
 expect "rc 块带可读性守卫" "grep -qF '[ -r ' '$HOME/.bashrc'"
 
 # 2) 幂等：重复安装不重复追加标记块
 bash "$REPO/install.sh" >/dev/null
-expect "幂等：rc 块只有一份" "[ \"\$(grep -cF '# >>> tui-mode-recovery >>>' '$HOME/.bashrc')\" = 1 ]"
+expect "幂等：rc 块只有一份" "[ \"\$(grep -cF '# >>> hermes-kbd-rcy >>>' '$HOME/.bashrc')\" = 1 ]"
 
 # 3) --check 干净状态
 expect "--check 干净时退出 0" "bash '$REPO/install.sh' --check >/dev/null 2>&1"
@@ -50,7 +50,7 @@ bash "$REPO/install.sh" --uninstall >/dev/null
 expect "卸载保留用户自建 hermes.fish" "[ -f '$FISH/hermes.fish' ]"
 expect "卸载删除本项目 tmr.fish" "[ ! -f '$FISH/tmr.fish' ]"
 expect "卸载删除 lib" "[ ! -f '$LIB' ]"
-expect "卸载删除 rc 块" "! grep -qF '# >>> tui-mode-recovery >>>' '$HOME/.bashrc'"
+expect "卸载删除 rc 块" "! grep -qF '# >>> hermes-kbd-rcy >>>' '$HOME/.bashrc'"
 
 echo
 echo "passed: $PASS  failed: $FAIL"

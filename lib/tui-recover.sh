@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
-# tui-mode-recovery — restore terminal mode state after TUI apps exit.
+# hermes-kbd-rcy — restore terminal mode state after TUI apps exit.
 # Source from ~/.bashrc or ~/.zshrc (install.sh adds a guarded block).
 #
-# Root cause & evidence: https://github.com/Eefung/tui-mode-recovery
+# Root cause & evidence: https://github.com/Eefung/hermes-kbd-rcy
 #
 # kitty keeps SEPARATE keyboard-protocol (CSI-u) stacks for the main and the
 # alternate screen. TUIs that push `CSI >1u` while INSIDE the alt screen and

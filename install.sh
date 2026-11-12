@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tui-mode-recovery installer.
+# hermes-kbd-rcy installer.
 #   install.sh               install / refresh (re-run after git pull)
 #   install.sh --check       verify installed copies match the repo; exit 1 on drift
 #   install.sh --uninstall   remove everything this script installed
@@ -7,11 +7,11 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FISH_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/fish/functions"
-DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/tui-mode-recovery"
+DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/hermes-kbd-rcy"
 LIB_DST="$DATA_DIR/lib/tui-recover.sh"
 FISH_FILES=(tui-recover.fish tmr.fish hermes.fish)
-MARKER="# >>> tui-mode-recovery >>>"
-MARKER_END="# <<< tui-mode-recovery <<<"
+MARKER="# >>> hermes-kbd-rcy >>>"
+MARKER_END="# <<< hermes-kbd-rcy <<<"
 RCS=("$HOME/.bashrc" "$HOME/.zshrc")
 
 usage() {
@@ -19,7 +19,7 @@ usage() {
 用法: install.sh [选项]
 
   （无参数）      安装 / 刷新：fish 函数复制到 fish 配置目录，lib 复制到
-                  ~/.local/share/tui-mode-recovery/，bash/zsh rc 追加带标记的 source 块
+                  ~/.local/share/hermes-kbd-rcy/，bash/zsh rc 追加带标记的 source 块
   --check         校验已安装副本与仓库一致；缺失或过期时退出码为 1
   --uninstall     只删除带本项目标记的文件与 rc 块，用户自建的同名函数不动
   -h, --help      显示本帮助
@@ -40,8 +40,8 @@ strip_rc_block() {  # $1 = rc 文件；存在标记块则整体删除
 rc_block() {
     cat <<EOF
 $MARKER
-# tui-mode-recovery: restore terminal mode state after TUI exit
-# (kitty CSI-u main/alt screen stacks; see https://github.com/Eefung/tui-mode-recovery)
+# hermes-kbd-rcy: restore terminal mode state after TUI exit
+# (kitty CSI-u main/alt screen stacks; see https://github.com/Eefung/hermes-kbd-rcy)
 [ -r "$LIB_DST" ] && . "$LIB_DST"
 $MARKER_END
 EOF
@@ -83,7 +83,7 @@ uninstall() {
     for f in "${FISH_FILES[@]}"; do
         [ -f "$FISH_DIR/$f" ] || continue
         # 只删除带本项目标记的文件，避免误删用户自建的同名 fish 函数
-        if grep -qF 'tui-mode-recovery' "$FISH_DIR/$f" 2>/dev/null; then
+        if grep -qF 'hermes-kbd-rcy' "$FISH_DIR/$f" 2>/dev/null; then
             rm -f "$FISH_DIR/$f"
             echo "removed fish function: $FISH_DIR/$f"
         else

@@ -1,4 +1,4 @@
-# installed by tui-mode-recovery — https://github.com/Eefung/tui-mode-recovery (remove: install.sh --uninstall)
+# installed by hermes-kbd-rcy — https://github.com/Eefung/hermes-kbd-rcy (remove: install.sh --uninstall)
 function tmr --description '运行命令,退出后自动恢复终端模式状态'
     if test (count $argv) -eq 0
         echo "tmr: 用法:tmr <命令> [参数...]" >&2
