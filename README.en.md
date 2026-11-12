@@ -8,7 +8,7 @@ This repo gives you one command that does not clear the screen, plus a small too
 
 `hermes --tui` leaves a keyboard setting behind when it exits (upstream [#56759](https://github.com/NousResearch/hermes-agent/issues/56759), still unfixed). The probe prints two lines:
 
-```
+```text
 main             0    OK (legacy key encoding)
 alt              1    STUCK — alt-screen apps (vi/micro/nano) will see CSI-u fragments like "113;5u"
 ```
@@ -76,7 +76,7 @@ CI runs everything on every push, including shellcheck and fish syntax checks.
 ## Documentation
 
 | Path | Purpose |
-|---|---|
+| --- | --- |
 | `functions/hermes.fish` | fish wrapper, autoloaded: cleans up after `hermes --tui` and bare `hermes` |
 | `functions/tmr.fish`, `functions/tui-recover.fish` | generic `tmr <command>` wrapper, and a bare `tui-recover` |
 | `lib/tui-recover.sh` | bash / zsh: `tmr` and `hermes` functions |

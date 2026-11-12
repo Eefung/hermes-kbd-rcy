@@ -8,7 +8,7 @@
 
 `hermes --tui` 退出时，会在终端里留下一份没清掉的键盘设置（上游 [#56759](https://github.com/NousResearch/hermes-agent/issues/56759) 未修）。探针读出来是这样两行：
 
-```
+```text
 main             0    OK (legacy key encoding)
 alt              1    STUCK — alt-screen apps (vi/micro/nano) will see CSI-u fragments like "113;5u"
 ```
@@ -76,7 +76,7 @@ CI 每次推送跑全套，含 shellcheck 与 fish 语法检查。
 ## 文档
 
 | 路径 | 作用 |
-|---|---|
+| --- | --- |
 | `functions/hermes.fish` | fish 自动加载：`hermes --tui` 与裸 `hermes` 退出后自动清理 |
 | `functions/tmr.fish`、`functions/tui-recover.fish` | 通用包装 `tmr <命令>`；只做恢复的 `tui-recover` |
 | `lib/tui-recover.sh` | bash / zsh：`tmr` 与 `hermes` 两个函数 |
