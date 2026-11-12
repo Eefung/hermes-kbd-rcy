@@ -15,7 +15,7 @@ alt              1    STUCK — alt-screen apps (vi/micro/nano) will see CSI-u f
 
 The command-line screen (main) reads 0; the fullscreen-program screen (alt) reads 1. An editor switches into the alt screen, inherits that setting, and keys become text.
 
-hermes restores focus reporting, bracketed paste, modifyOtherKeys and the cursor itself on exit. The one thing it does not restore is the alt screen's keyboard setting, because `<u` comes after `1049l`, so the pop lands on the main screen. The command therefore does exactly one thing: enter the alt screen, pop, come back — the same mechanism hermes uses in its own exit cleanup, one `<u>` is enough. Full measurements: [evidence](docs/evidence.md).
+hermes restores focus reporting, bracketed paste, modifyOtherKeys and the cursor itself on exit. The one thing it does not restore is the alt screen's keyboard setting, because `<u` comes after `1049l`, so the pop lands on the main screen. The command therefore does exactly one thing: enter the alt screen, pop, come back — the same mechanism hermes uses in its own exit cleanup, one `<u>` is enough. Measurements: [evidence](docs/evidence.md).
 
 ## Installation
 
