@@ -11,7 +11,7 @@
 用 `script` 给 `hermes --tui` 一个 pty，把启动字节存盘，统计关键序列首次出现的偏移：
 
 | 序列 | 首次出现偏移 |
-|---|---|
+| --- | --- |
 | `\e[?1049l`（离开 alt） | 749 |
 | `\e[<u`（pop） | 757 |
 | `\e[>4m`（复位 modifyOtherKeys） | 761 |
@@ -24,7 +24,7 @@
 
 在 pty 里跑 `hermes --tui`，输入 `/quit`，捕获退出字节。最后一块复位序列是：
 
-```
+```text
 … 1004l → 2004l → 1049l → <u → >4m → 0m → 25h
 ```
 
@@ -36,7 +36,7 @@
 ## 二、两页互不继承，残留只落在全屏页
 
 | 步骤 | 查询页 | flags |
-|---|---|---|
+| --- | --- | --- |
 | 基线 | 主屏 | 0 |
 | 主屏 push `>1u` | 主屏 | 1 |
 | 进 alt | alt | 0 |
@@ -52,7 +52,7 @@
 
 `kbdprobe.py --simulate --fix` 的原始输出：
 
-```
+```text
 main             0    OK (legacy key encoding)
 alt              1    STUCK — alt-screen apps (vi/micro/nano) will see CSI-u fragments like "113;5u"
 main_after_fix   0    OK (legacy key encoding)
@@ -66,7 +66,7 @@ alt_after_fix    0    OK (legacy key encoding)
 同一残留状态下，从主屏依次试几种写法：
 
 | 候选序列 | 主屏 | alt 页 |
-|---|---|---|
+| --- | --- | --- |
 | 当前序列（进全屏页弹一次） | 0 | 0 |
 | 只 `=0u`，每页一次 | 0 | 0 |
 | 只 `<u>`，每页一次 | 0 | 0 |
@@ -76,7 +76,7 @@ alt_after_fix    0    OK (legacy key encoding)
 ### 栈深对照
 
 | 场景 | 主屏 | alt 页 |
-|---|---|---|
+| --- | --- | --- |
 | 深度 1，只 `<u>` | 0 | 0 |
 | 深度 1，只 `=0u` | 0 | 0 |
 | 深度 2，只 `<u>` | 0 | 1 |
@@ -89,7 +89,7 @@ alt_after_fix    0    OK (legacy key encoding)
 对同一残留状态逐步操作，每步之后读一次 `CSI ? u`（脚本直接写 `/dev/tty`，在 kitty 0.49.2 里跑）：
 
 | 操作 | 读出 |
-|---|---|
+| --- | --- |
 | alt 页内 `>1u`（栈深 1） | 1 |
 | 接 `=0u` | 0 |
 | 再接 `<u` | 0 |
@@ -110,7 +110,7 @@ kitty 上这几种短写法都能把 alt 页清零；仓库取「进全屏页弹
 ## 环境
 
 | 项 | 值 |
-|---|---|
+| --- | --- |
 | 系统 | CachyOS，内核 7.3.3-1-cachyos |
 | 会话 | KDE Plasma，Wayland |
 | 终端 | kitty 0.49.2 |
