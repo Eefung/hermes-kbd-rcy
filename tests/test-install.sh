@@ -52,6 +52,35 @@ expect "卸载删除本项目 tmr.fish" "[ ! -f '$FISH/tmr.fish' ]"
 expect "卸载删除 lib" "[ ! -f '$LIB' ]"
 expect "卸载删除 rc 块" "! grep -qF '# >>> hermes-kbd-rcy >>>' '$HOME/.bashrc'"
 
+# 6) 反复安装不堆积空行（每次追加的块前空行应在 strip 时回收）
+for _ in 1 2 3; do bash "$REPO/install.sh" >/dev/null; done
+expect "重复安装不堆空行（rc 内至多一行空行）" \
+    "awk '{ if (length == 0) n++ } END { exit !(n <= 1) }' '$HOME/.bashrc'"
+
+# 7) rc 块在、但加载的不是当前 lib → --check 必须报漂移
+sed "s|$LIB|/old/gone/lib/tui-recover.sh|g" "$HOME/.bashrc" > "$HOME/.bashrc.stale"
+mv "$HOME/.bashrc.stale" "$HOME/.bashrc"
+expect "块指向旧路径时 --check 退出 1" "! bash '$REPO/install.sh' --check >/dev/null 2>&1"
+bash "$REPO/install.sh" >/dev/null   # 刷新
+expect "刷新后 --check 恢复 0" "bash '$REPO/install.sh' --check >/dev/null 2>&1"
+
+# 8) 软链 rc：安装与卸载都不能把链接换成普通文件
+printf '# dotfiles bashrc\n' > "$TMP/dotfile-bashrc"
+rm -f "$HOME/.bashrc"
+ln -s "$TMP/dotfile-bashrc" "$HOME/.bashrc"
+bash "$REPO/install.sh" >/dev/null
+bash "$REPO/install.sh" >/dev/null
+expect "重复安装后 rc 仍是软链" "[ -L '$HOME/.bashrc' ]"
+expect "块写进了软链目标" "grep -qF '# >>> hermes-kbd-rcy >>>' '$TMP/dotfile-bashrc'"
+bash "$REPO/install.sh" --uninstall >/dev/null
+expect "卸载后 rc 仍是软链" "[ -L '$HOME/.bashrc' ]"
+expect "卸载后软链目标里块已删除" "! grep -qF '# >>> hermes-kbd-rcy >>>' '$TMP/dotfile-bashrc'"
+
+# 9) 块残缺（缺结束标记）：卸载不动文件，不删标记之后的内容
+printf '# top\n# >>> hermes-kbd-rcy >>>\nUSER-LINE-AFTER\n' > "$HOME/.zshrc"
+bash "$REPO/install.sh" --uninstall >/dev/null
+expect "缺结束标记时卸载保留标记之后的内容" "grep -qF 'USER-LINE-AFTER' '$HOME/.zshrc'"
+
 echo
 echo "passed: $PASS  failed: $FAIL"
 [ "$FAIL" -eq 0 ]

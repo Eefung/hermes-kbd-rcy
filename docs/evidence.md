@@ -103,9 +103,9 @@ kitty 上这几种短写法都能把 alt 页清零；仓库取「进全屏页弹
 
 ## 四、包装与安装器的行为
 
-`tests/test-byte-output.sh` 用假二进制加真实 pty 核对：pty 下发出的字节与预期序列完全一致、退出码 7 原样透传、管道调用零转义字节、非 TUI 参数零字节。
+`tests/test-byte-output.sh` 用假二进制加真实 pty 核对：pty 下发出的字节与预期序列完全一致、退出码 7 原样透传、管道调用零转义字节、非 TUI 参数零字节、`--tui` 只出现在单个参数里时零字节、bash 的 `tui-recover` 函数与 `bin/tui-recover` 字节一致、`bin/tui-recover` 未知参数与多余参数退出 2（18 个用例）。
 
-`tests/test-install.sh` 在临时 HOME 沙箱里核对：安装、幂等刷新、`--check` 漂移检测、`--uninstall` 只删带标记的文件与 rc 块、用户自建的同名 `hermes.fish` 不动。探针的应答解析拆成纯函数并配了单测（`tests/test_probe.py`）。整套检查由 CI 在每次推送时执行。
+`tests/test-install.sh` 在临时 HOME 沙箱里核对：安装、幂等刷新、`--check` 漂移检测（含块在但加载的不是当前 lib）、`--uninstall` 只删带标记的文件与 rc 块、用户自建的同名 `hermes.fish` 不动、软链 rc 在安装与卸载后仍是软链、重复安装不堆空行、块残缺（缺结束标记）时卸载不动文件（19 个用例）。探针的应答解析拆成纯函数并配了单测（`tests/test_probe.py`）。整套检查由 CI 在每次推送时执行。
 
 ## 环境
 

@@ -64,8 +64,8 @@ v0.18 会累积多条 push，一次 `<u>` 不够，不在覆盖范围。拿 `=0u
 ## 开发
 
 ```sh
-tests/test-byte-output.sh                              # 12 个字节级用例
-tests/test-install.sh                                  # 11 个安装器用例
+tests/test-byte-output.sh                              # 18 个字节级用例
+tests/test-install.sh                                  # 19 个安装器用例
 python3 -m unittest discover -s tests -p 'test_*.py'   # 7 个探针解析单测
 ```
 
@@ -75,7 +75,7 @@ python3 -m unittest discover -s tests -p 'test_*.py'   # 7 个探针解析单测
 | --- | --- |
 | `functions/hermes.fish` | fish 自动加载：`hermes --tui` 与裸 `hermes` 退出后自动清理 |
 | `functions/tmr.fish`、`functions/tui-recover.fish` | 通用包装 `tmr <命令>`；只做恢复的 `tui-recover` |
-| `lib/tui-recover.sh` | bash / zsh：`tmr` 与 `hermes` 两个函数 |
+| `lib/tui-recover.sh` | bash / zsh：`tmr`、`hermes`、`tui-recover` 三个函数 |
 | `tools/kbdprobe.py` | 探针：按页读 `CSI ? u`，可复现、可修复、可输出 JSON |
 | `bin/tui-recover` | 独立 CLI：不需要 shell 包装，`--dry-run` 只看字节 |
 | `install.sh` | 安装、`--check` 漂移检测、卸载 |

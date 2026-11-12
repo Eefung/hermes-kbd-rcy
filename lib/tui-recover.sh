@@ -17,6 +17,21 @@ tui_recover_seq() {
     printf '\e[?1049h\e[<u\e[?1049l'
 }
 
+# TUI 候选判定：逐个参数比较。整串拼接后再做子串匹配会误中
+# `hermes chat -q "… --tui …"` 这类把 --tui 含在单个参数里的非 TUI 调用。
+tui_recover_wanted() {
+    local a
+    for a in "$@"; do
+        [ "$a" = "--tui" ] && return 0
+    done
+    return 1
+}
+
+# tui-recover — 只做恢复（与 functions/tui-recover.fish 对应）
+tui-recover() {
+    tui_recover_seq
+}
+
 # tmr <command> [args...] — run a command, restore terminal state after it exits.
 tmr() {
     command "$@"
@@ -32,7 +47,7 @@ tmr() {
 hermes() {
     command hermes "$@"
     local rc=$?
-    if [ -t 1 ] && { [ $# -eq 0 ] || [[ "$*" == *--tui* ]]; }; then
+    if [ -t 1 ] && { [ $# -eq 0 ] || tui_recover_wanted "$@"; }; then
         tui_recover_seq
     fi
     return $rc

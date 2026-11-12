@@ -10,7 +10,9 @@ function hermes --wraps hermes --description 'hermes + 退出后恢复终端键�
     # 触发条件:带 --tui,或无参数(display.interface: tui 时裸 hermes 直接进 TUI);
     # 只在 stdout 是 tty 时发序列,管道/脚本调用(hermes chat -q)输出不受污染。
     set -l trigger ''
-    if test (count $argv) -eq 0; or string match -q -- '*--tui*' "$argv"
+    if test (count $argv) -eq 0; or contains -- --tui $argv
+        # 逐个元素比较:"$argv" 会把列表拼成一个串,子串匹配会误中 "--tui" 出现在
+        # 单个参数里(如 hermes chat -q "… --tui …")的非 TUI 调用。
         set trigger yes
     end
     if isatty stdout; and test -n "$trigger"

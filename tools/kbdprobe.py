@@ -18,6 +18,7 @@ Usage:
 
 Note: --simulate really does dirty the alt-screen stack; pair it with --fix.
 """
+import argparse
 import json
 import os
 import re
@@ -69,15 +70,36 @@ def fmt(screen, flags):
             f'will see CSI-u fragments like "113;5u"')
 
 
+def parse_args(argv):
+    p = argparse.ArgumentParser(
+        prog='kbdprobe.py',
+        description='Inspect and repair kitty keyboard-protocol (CSI-u) state, '
+                    'per screen.')
+    p.add_argument('--simulate', action='store_true',
+                   help='push flags=1 inside the alt screen first (recreates the leak)')
+    p.add_argument('--fix', action='store_true',
+                   help='apply the two-screen cleanup, then re-report')
+    p.add_argument('--json', action='store_true', dest='as_json',
+                   help='machine-readable output')
+    return p.parse_args(argv)
+
+
+def open_tty():
+    """Writable handle on the controlling terminal (a redirected stdout cannot carry sequences)."""
+    try:
+        return os.open('/dev/tty', os.O_WRONLY)
+    except OSError as exc:
+        sys.exit(f'kbdprobe: no controlling terminal ({exc.strerror}) — run it in a real terminal')
+
+
 def main():
-    args = sys.argv[1:]
-    do_sim = '--simulate' in args
-    do_fix = '--fix' in args
-    as_json = '--json' in args
+    args = parse_args(sys.argv[1:])
+    if not sys.stdin.isatty():
+        sys.exit('kbdprobe: stdin is not a terminal — run it in a real terminal')
 
     import tty
     fd = sys.stdin.fileno()
-    ttyfd = os.open('/dev/tty', os.O_WRONLY)  # sequences must go to the real tty
+    ttyfd = open_tty()  # sequences must go to the real tty
 
     def w(s):
         os.write(ttyfd, s.encode('latin1'))
@@ -86,13 +108,13 @@ def main():
     data = {}
     try:
         tty.setraw(fd)
-        if do_sim:
+        if args.simulate:
             w(SIM_SEQ)
         data['main'] = query(fd, ttyfd)
         w('\x1b[?1049h')
         data['alt'] = query(fd, ttyfd)
         w('\x1b[?1049l')
-        if do_fix:
+        if args.fix:
             w(FIX_SEQ)
             data['main_after_fix'] = query(fd, ttyfd)
             w('\x1b[?1049h')
@@ -103,7 +125,7 @@ def main():
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old)
 
-    if as_json:
+    if args.as_json:
         print(json.dumps(data, indent=2))
     else:
         for k, v in data.items():

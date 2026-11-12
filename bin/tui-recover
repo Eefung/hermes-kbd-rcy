@@ -19,6 +19,11 @@ usage() {
 EOF
 }
 
+if [ "$#" -gt 1 ]; then
+    usage >&2
+    exit 2
+fi
+
 case "${1:-}" in
     -h|--help) usage; exit 0 ;;
     --dry-run)

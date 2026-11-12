@@ -26,15 +26,29 @@ usage() {
 EOF
 }
 
-strip_rc_block() {  # $1 = rc 文件；存在标记块则整体删除
-    local rc="$1"
-    grep -qF "$MARKER" "$rc" || return 0
-    awk -v s="$MARKER" -v e="$MARKER_END" '
-        $0 == s { skip = 1; next }
-        $0 == e { skip = 0; next }
-        !skip
-    ' "$rc" > "$rc.tmr.tmp"
-    mv "$rc.tmr.tmp" "$rc"
+strip_rc_block() {  # $1 = rc 文件；存在完整标记块则整块删除（含块前空行），原地写回
+    local rc="$1" start end from prev tmp
+    [ -f "$rc" ] || return 0
+    start=$(awk -v s="$MARKER" '$0 == s { print NR; exit }' "$rc")
+    [ -n "$start" ] || return 0
+    # 缺结束标记就不动文件：块残缺时按标记跳到 EOF 会把块后的用户内容一起删掉
+    end=$(awk -v s="$MARKER" -v e="$MARKER_END" \
+        'hit && $0 == e { print NR; exit } $0 == s { hit = 1 }' "$rc")
+    [ -n "$end" ] || return 0
+    from="$start"
+    if [ "$start" -gt 1 ]; then
+        prev=$(awk -v n="$((start - 1))" 'NR == n' "$rc")
+        # 连带 install 追加在块前的空行一起删，反复安装才不会堆积空行
+        [ -z "$prev" ] && from=$((start - 1))
+    fi
+    tmp=$(mktemp "$rc.tmr.XXXXXX")
+    sed "${from},${end}d" "$rc" > "$tmp"
+    cat "$tmp" > "$rc"   # 原地截断写回：保留软链、inode 与权限
+    rm -f "$tmp"
+}
+
+rc_source_line() {  # rc 块里那一行 source；安装、校验、删除三处共用同一份文本
+    printf '[ -r "%s" ] && . "%s"\n' "$LIB_DST" "$LIB_DST"
 }
 
 rc_block() {
@@ -42,13 +56,14 @@ rc_block() {
 $MARKER
 # hermes-kbd-rcy: restore terminal mode state after TUI exit
 # (kitty CSI-u main/alt screen stacks; see https://github.com/Eefung/hermes-kbd-rcy)
-[ -r "$LIB_DST" ] && . "$LIB_DST"
+$(rc_source_line)
 $MARKER_END
 EOF
 }
 
 check() {
-    local drift=0 f rc
+    local drift=0 f rc want
+    want=$(rc_source_line)
     for f in "${FISH_FILES[@]}"; do
         if [ ! -f "$FISH_DIR/$f" ]; then
             echo "missing: $FISH_DIR/$f"
@@ -67,8 +82,12 @@ check() {
     fi
     for rc in "${RCS[@]}"; do
         [ -f "$rc" ] || continue
-        if ! grep -qF "$MARKER" "$rc"; then
+        if ! grep -qF "$MARKER" "$rc" || ! grep -qF "$MARKER_END" "$rc"; then
             echo "missing: rc 块 in $rc"
+            drift=1
+        elif ! grep -qxF "$want" "$rc"; then
+            # 块在、但加载的不是当前 $LIB_DST（旧克隆路径等），新开 shell 时静默不生效
+            echo "drift:   rc 块 in $rc（未加载 $LIB_DST；重新运行 ./install.sh 刷新）"
             drift=1
         fi
     done

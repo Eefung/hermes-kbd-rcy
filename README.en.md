@@ -64,8 +64,8 @@ No — remove the layer with `./install.sh --uninstall`.
 ## Development
 
 ```sh
-tests/test-byte-output.sh                              # 12 byte-level cases
-tests/test-install.sh                                  # 11 installer cases
+tests/test-byte-output.sh                              # 18 byte-level cases
+tests/test-install.sh                                  # 19 installer cases
 python3 -m unittest discover -s tests -p 'test_*.py'   # 7 probe-parser unit tests
 ```
 
@@ -75,7 +75,7 @@ python3 -m unittest discover -s tests -p 'test_*.py'   # 7 probe-parser unit tes
 | --- | --- |
 | `functions/hermes.fish` | fish wrapper, autoloaded: cleans up after `hermes --tui` and bare `hermes` |
 | `functions/tmr.fish`, `functions/tui-recover.fish` | generic `tmr <command>` wrapper, and a bare `tui-recover` |
-| `lib/tui-recover.sh` | bash / zsh: `tmr` and `hermes` functions |
+| `lib/tui-recover.sh` | bash / zsh: `tmr`, `hermes` and `tui-recover` functions |
 | `tools/kbdprobe.py` | probe: reads `CSI ? u` per screen, reproduce / fix / JSON |
 | `bin/tui-recover` | standalone CLI: no shell wrapper needed, `--dry-run` shows bytes |
 | `install.sh` | install, `--check` drift detection, uninstall |
