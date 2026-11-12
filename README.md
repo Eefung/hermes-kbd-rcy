@@ -15,7 +15,7 @@ alt              1    STUCK — alt-screen apps (vi/micro/nano) will see CSI-u f
 
 命令行这一页（主屏）是 0，全屏程序页（alt 屏）是 1。编辑器切进全屏页，接手的正是这份设置，按键于是变成文本。
 
-hermes 退出时自己会恢复 focus 上报、粘贴模式、modifyOtherKeys 和光标，唯一没恢复的就是全屏页的键盘设置，因为 `<u` 排在 `1049l` 后面，弹栈落在主屏。所以命令只做一件事：进全屏页弹一次，再回来——和 hermes 自己的退出清理同一种机制，一次 `<u>` 即恢复。完整测量见[实测记录](docs/evidence.md)。
+hermes 退出时自己会恢复 focus 上报、粘贴模式、modifyOtherKeys 和光标，唯一没恢复的就是全屏页的键盘设置，因为 `<u` 排在 `1049l` 后面，弹栈落在主屏。所以命令只做一件事：进全屏页弹一次，再回来——和 hermes 自己的退出清理同一种机制，一次 `<u>` 即恢复。见[实测记录](docs/evidence.md)。
 
 ## 安装
 
